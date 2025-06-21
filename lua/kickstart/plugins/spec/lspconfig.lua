@@ -101,12 +101,12 @@ return {
       -- Lista dei file di configurazione LSP da caricare
       local lsp_config_files = {
         "clangd",
-        "pyright", 
+        "pyright",
         "rust_analyzer",
         "jsonls",
         "yamlls",
         "web",
-        "lua_ls"
+        "lua_ls",
       }
       
       for _, file_name in ipairs(lsp_config_files) do
@@ -126,6 +126,16 @@ return {
           -- Debug: stampa se il caricamento fallisce
           vim.notify("Impossibile caricare " .. module_name, vim.log.levels.WARN)
         end
+      end
+
+      -- Setup manuale per dartls che non è installato da Mason
+      local ok, dart_spec = pcall(require, 'kickstart.plugins.spec.dartls')
+      if ok then
+        local dart_config = dart_spec.dartls or {}
+        dart_config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, dart_config.capabilities or {})
+        require('lspconfig').dartls.setup(dart_config)
+      else
+        vim.notify("Impossibile caricare la configurazione di dartls", vim.log.levels.WARN)
       end
 
       -- Ensure the servers and tools above are installed
