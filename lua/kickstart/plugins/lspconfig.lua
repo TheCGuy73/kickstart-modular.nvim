@@ -22,12 +22,16 @@ return {
       { 'williamboman/mason.nvim', opts = {} },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
+      
 
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
+
+      -- Schemas per JSON
+      'b0o/schemastore.nvim',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -209,6 +213,136 @@ return {
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
+        -- C/C++ con clangd
+        clangd = {
+          capabilities = capabilities,
+          cmd = {
+            "clangd",
+            "--background-index",
+            "--clang-tidy",
+            "--header-insertion=iwyu",
+            "--completion-style=detailed",
+            "--fallback-style=Google",
+            "--suggest-missing-includes",
+            "--all-scopes-completion",
+            "--cross-file-rename",
+            "--log=error",
+            "--pretty",
+            "--pch-storage=memory",
+            "--ranking-model=heuristics",
+            "--folding-ranges",
+            "--enable-config",
+            "--offset-encoding=utf-16",
+          },
+          filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+          init_options = {
+            usePlaceholders = true,
+            completeUnimported = true,
+            clangdFileStatus = true,
+          },
+          settings = {
+            clangd = {
+              arguments = {
+                "--background-index",
+                "--clang-tidy",
+                "--header-insertion=iwyu",
+                "--completion-style=detailed",
+                "--fallback-style=Google",
+                "--suggest-missing-includes",
+                "--all-scopes-completion",
+                "--cross-file-rename",
+                "--log=error",
+                "--pretty",
+                "--pch-storage=memory",
+                "--ranking-model=heuristics",
+                "--folding-ranges",
+                "--enable-config",
+                "--offset-encoding=utf-16",
+              },
+            },
+          },
+        },
+
+        -- Python con pyright
+        pyright = {
+          capabilities = capabilities,
+          settings = {
+            python = {
+              analysis = {
+                typeCheckingMode = "basic",
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                diagnosticMode = "workspace",
+              },
+            },
+          },
+        },
+
+        -- Rust con rust_analyzer
+        rust_analyzer = {
+          capabilities = capabilities,
+          settings = {
+            ['rust-analyzer'] = {
+              cargo = {
+                allFeatures = true,
+                loadOutDirsFromCheck = true,
+                runBuildScripts = true,
+              },
+              procMacro = {
+                enable = true,
+              },
+              checkOnSave = {
+                command = "clippy",
+              },
+              inlayHints = {
+                enable = true,
+                showParameterHints = true,
+                showTypeHints = true,
+                showChainingHints = true,
+              },
+            },
+          },
+        },
+
+        -- JSON con jsonls
+        jsonls = {
+          capabilities = capabilities,
+          settings = {
+            json = {
+              schemas = pcall(require, 'schemastore') and require('schemastore').json.schemas() or {},
+              validate = { enable = true },
+            },
+          },
+        },
+
+        -- YAML con yamlls
+        yamlls = {
+          capabilities = capabilities,
+          settings = {
+            yaml = {
+              schemas = {
+                ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+                ["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "docker-compose*.yml",
+              },
+            },
+          },
+        },
+
+        -- HTML con html
+        html = {
+          capabilities = capabilities,
+        },
+
+        -- CSS con cssls
+        cssls = {
+          capabilities = capabilities,
+        },
+
+        -- Tailwind CSS
+        tailwindcss = {
+          capabilities = capabilities,
+        },
+
         -- clangd = {},
         -- gopls = {},
         -- pyright = {},
@@ -254,12 +388,18 @@ return {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'clang-format', -- Used to format C/C++ code
+        'prettier', -- Used to format JS/TS/JSON/CSS/HTML
+        'black', -- Used to format Python code
+        'isort', -- Used to sort Python imports
+        'rustfmt', -- Used to format Rust code
+        'shfmt', -- Used to format shell scripts
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
-        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
-        automatic_installation = false,
+        ensure_installed = vim.tbl_keys(servers), -- Installa automaticamente tutti i server configurati
+        automatic_installation = true,
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
