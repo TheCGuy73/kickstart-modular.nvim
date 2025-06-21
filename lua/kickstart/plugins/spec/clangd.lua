@@ -1,0 +1,50 @@
+return {
+  -- C/C++ con clangd
+  clangd = {
+    cmd = {
+      "clangd",
+      "--background-index",
+      "--clang-tidy",
+      "--header-insertion=iwyu",
+      "--completion-style=detailed",
+      "--fallback-style=Google",
+      "--suggest-missing-includes",
+      "--all-scopes-completion",
+      "--cross-file-rename",
+      "--log=error",
+      "--pretty",
+      "--pch-storage=memory",
+      "--ranking-model=heuristics",
+      "--folding-ranges",
+      "--enable-config",
+      "--offset-encoding=utf-16",
+    },
+    filetypes = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
+    init_options = {
+      usePlaceholders = true,
+      completeUnimported = true,
+      clangdFileStatus = true,
+    },
+    settings = {
+      clangd = {
+        arguments = {
+          "--background-index",
+          "--clang-tidy",
+          "--header-insertion=iwyu",
+          "--completion-style=detailed",
+          "--fallback-style=Google",
+          "--suggest-missing-includes",
+          "--all-scopes-completion",
+          "--cross-file-rename",
+          "--log=error",
+          "--pretty",
+          "--pch-storage=memory",
+          "--ranking-model=heuristics",
+          "--folding-ranges",
+          "--enable-config",
+          "--offset-encoding=utf-16",
+        },
+      },
+    },
+  },
+} 
