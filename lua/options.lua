@@ -73,6 +73,12 @@ vim.o.termguicolors = true
 -- Hide tilde characters
 vim.o.fillchars = vim.o.fillchars .. 'eob: '
 
+-- Disable the default filesystem mode to use neotree
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+
+-- Set the font for Neovide
 if vim.g.neovide then
     vim.o.guifont = 'DejaVuSansM Nerd Font Mono:h14'
 end

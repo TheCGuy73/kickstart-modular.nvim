@@ -97,26 +97,27 @@ return {
 
       -- Carica dinamicamente tutti i server LSP dalla directory spec
       local servers = {}
-      
+
       -- Lista dei file di configurazione LSP da caricare
       local lsp_config_files = {
-        "clangd",
-        "pyright",
-        "rust_analyzer",
-        "jsonls",
-        "yamlls",
-        "web",
-        "lua_ls",
+        'clangd',
+        'pyright',
+        'rust_analyzer',
+        'jsonls',
+        'yamlls',
+        'web',
+        'lua_ls',
+        -- 'dartls', -- NOTA: Il server Dart LSP è incluso nel Dart SDK. Installalo separatamente.
       }
-      
+
       for _, file_name in ipairs(lsp_config_files) do
-        local module_name = "kickstart.plugins.spec." .. file_name
+        local module_name = 'kickstart.plugins.spec.' .. file_name
         local ok, server_config = pcall(require, module_name)
-        
-        if ok and type(server_config) == "table" then
+
+        if ok and type(server_config) == 'table' then
           -- Gestisce sia configurazioni singole che multiple
           for server_name, config in pairs(server_config) do
-            if type(config) == "table" then
+            if type(config) == 'table' then
               -- Aggiungi le capabilities a ogni server
               config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, config.capabilities or {})
               servers[server_name] = config
@@ -124,18 +125,18 @@ return {
           end
         else
           -- Debug: stampa se il caricamento fallisce
-          vim.notify("Impossibile caricare " .. module_name, vim.log.levels.WARN)
+          vim.notify('Impossibile caricare ' .. module_name, vim.log.levels.WARN)
         end
       end
 
-      -- Setup manuale per dartls che non è installato da Mason
+      -- Configurazione manuale per dartls
       local ok, dart_spec = pcall(require, 'kickstart.plugins.spec.dartls')
       if ok then
         local dart_config = dart_spec.dartls or {}
         dart_config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, dart_config.capabilities or {})
         require('lspconfig').dartls.setup(dart_config)
       else
-        vim.notify("Impossibile caricare la configurazione di dartls", vim.log.levels.WARN)
+        vim.notify("Configurazione di dartls non trovata o non valida.", vim.log.levels.WARN)
       end
 
       -- Ensure the servers and tools above are installed

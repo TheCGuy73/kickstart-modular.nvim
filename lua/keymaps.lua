@@ -69,6 +69,11 @@ vim.keymap.set('n', '<leader>sn', function()
   require('telescope.builtin').find_files { cwd = vim.fn.stdpath 'config' }
 end, { desc = '[S]earch [N]eovim files' })
 
+-- Telescope File Browser
+vim.keymap.set('n', '<leader>e', function()
+  require('telescope.builtin').find_files()
+end, { desc = 'Toggle file [e]xplorer' })
+
 -- [[ LSP Keymaps ]]
 -- These will be set up when LSP attaches to a buffer
 local function setup_lsp_keymaps(client, bufnr)
@@ -179,13 +184,10 @@ vim.keymap.set('n', '<leader>f', function()
   require('conform').format { async = true, lsp_format = 'fallback' }
 end, { desc = '[F]ormat buffer' })
 
--- [[ Neo-tree Keymaps ]]
-vim.keymap.set('n', '\\', ':Neotree reveal<CR>', { desc = 'NeoTree reveal', silent = true })
-
 -- [[ Diagnostic Keymaps ]]
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Previous diagnostic' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic' })
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic' })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.open_float, { desc = 'Show diagnostic' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`

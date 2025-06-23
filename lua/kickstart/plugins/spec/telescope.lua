@@ -26,6 +26,7 @@ return {
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
+      { 'nvim-telescope/telescope-file-browser.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
@@ -72,6 +73,20 @@ return {
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      -- pcall(require('telescope').load_extension, 'file_browser')
+
+      -- Avvia Telescope file browser all'avvio in determinate condizioni
+      local group = vim.api.nvim_create_augroup('Telescope_start_browser', { clear = true })
+      vim.api.nvim_create_autocmd('VimEnter', {
+        group = group,
+        pattern = '*',
+        callback = function()
+          local is_dir = vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1
+          if (vim.fn.argc() == 0 or is_dir) and not vim.o.diff then
+            require('telescope.builtin').find_files()
+          end
+        end,
+      })
     end,
   },
 }
